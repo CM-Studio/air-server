@@ -20,12 +20,12 @@ var routes = Routes{
 		"/",
 		Index,
 	},
-	// Route{
-	// 	"ReturnSperifiedData",
-	// 	"GET",
-	// 	"/aqi/{city:[\u4E00-\u9FA5]+}&{time:[0-9]+}",
-	// 	ReturnSperifiedData,
-	// },
+	Route{
+		"ReturnSperifiedData",
+		"GET",
+		"/aqi/{city:[\u4E00-\u9FA5]+}&{time:[0-9]+}",
+		ReturnSperifiedData,
+	},
 	Route{
 		"ReturnNowData",
 		"GET",
