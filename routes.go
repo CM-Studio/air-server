@@ -1,0 +1,65 @@
+package main
+
+import (
+	"net/http"
+)
+
+type Route struct {
+	Name        string
+	Method      string
+	Pattern     string
+	HandlerFunc http.HandlerFunc
+}
+
+type Routes []Route
+
+var routes = Routes{
+	Route{
+		"Index",
+		"GET",
+		"/",
+		Index,
+	},
+	// Route{
+	// 	"ReturnSperifiedData",
+	// 	"GET",
+	// 	"/aqi/{city:[\u4E00-\u9FA5]+}&{time:[0-9]+}",
+	// 	ReturnSperifiedData,
+	// },
+	Route{
+		"ReturnNowData",
+		"GET",
+		"/aqi/{city:[\u4E00-\u9FA5]+}&now",
+		ReturnNowData,
+	},
+	Route{
+		"ReturnAllDataToday",
+		"GET",
+		"/aqi/{city:[\u4E00-\u9FA5]+}&today",
+		ReturnAllDataToday,
+	},
+	Route{
+		"ReturnDataOfCities",
+		"GET",
+		"/aqi/cities",
+		ReturnDataOfCities,
+	},
+	Route{
+		"ReturnTrendData",
+		"GET",
+		"/aqi/{city:[\u4E00-\u9FA5]+}&trend",
+		ReturnTrendData,
+	},
+	Route{
+		"ReturnCityTable",
+		"GET",
+		"/aqi/allcity",
+		ReturnCityTable,
+	},
+	Route{
+		"ReturnOneCityAllStation",
+		"GET",
+		"/aqi/{city:[\u4E00-\u9FA5]+}&station",
+		ReturnOneCityAllStation,
+	},
+}
