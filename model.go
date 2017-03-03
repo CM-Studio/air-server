@@ -207,8 +207,9 @@ func OneCityAllDataToday(t string, location string) (datas AQIDatas) {
 				datas = append(datas, data)
 			}
 		} else {
-			errMsg := jsonErr{Code: 404, Text: "没有" + location + h + "的空气质量数据！"}
-			datas = append(datas, errMsg)
+			// errMsg := jsonErr{Code: 404, Text: "没有" + location + h + "的空气质量数据！"}
+			// datas = append(datas, errMsg)
+			continue
 		}
 
 	}
