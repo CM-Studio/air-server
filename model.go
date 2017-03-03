@@ -262,10 +262,10 @@ func TrendDataNow(t string, location string) (datas AQIDatas) {
 	checkErr(err)
 	defer rowsN.Close()
 
-	// var sN sql.NullString
-	// err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tn, location).Scan(&sN)
+	var sN sql.NullString
+	err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tn, location).Scan(&sN)
 
-	if rowsN.Next() {
+	if sN.Valid && rowsN.Next() {
 		err := rowsN.Scan(&aqiN)
 		checkErr(err)
 
@@ -273,10 +273,10 @@ func TrendDataNow(t string, location string) (datas AQIDatas) {
 		checkErr(err)
 		defer rowsB.Close()
 
-		// var sB sql.NullString
-		// err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tb, location).Scan(&sB)
+		var sB sql.NullString
+		err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tb, location).Scan(&sB)
 
-		if rowsB.Next() {
+		if sB.Valid && rowsB.Next() {
 			err := rowsB.Scan(&aqiB)
 			checkErr(err)
 
