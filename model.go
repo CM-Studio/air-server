@@ -66,6 +66,45 @@ func checkErr(err error) {
 	}
 }
 
+func OneCityLatestData(location string) (datas AQIDatas) {
+	db := Conn()
+	defer db.Close()
+
+	rows, err := db.Query("SELECT avg(TimePoint),Area,avg(AQI),avg(O3),avg(CO),avg(SO2),avg(NO2),avg(PM2_5),avg(PM10) FROM airx.raw where TimePoint=(select max(TimePoint) from airx.raw) and Area='" + location + "';")
+	checkErr(err)
+	defer rows.Close()
+
+	var (
+		time float64
+		area string
+		aqi  float64
+		o3   float64
+		co   float64
+		so2  float64
+		no2  float64
+		pm25 float64
+		pm10 float64
+	)
+
+	var s sql.NullString
+	err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=(select max(TimePoint) from airx.raw) and Area=? limit 1;", location).Scan(&s)
+
+	if s.Valid {
+		for rows.Next() {
+			err := rows.Scan(&time, &area, &aqi, &o3, &co, &so2, &no2, &pm25, &pm10)
+			checkErr(err)
+			data := AQIData{time, area, aqi, o3, co, so2, no2, pm25, pm10}
+			datas = append(datas, data)
+		}
+	} else {
+		errMsg := jsonErr{Code: 404, Text: "没有" + location + "最新的空气质量数据！"}
+		datas = append(datas, errMsg)
+	}
+
+	return
+
+}
+
 func OneCitySingleData(t string, location string) (datas AQIDatas) {
 	db := Conn()
 	defer db.Close()

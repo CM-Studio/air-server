@@ -34,9 +34,8 @@ func ReturnSperifiedData(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReturnNowData(w http.ResponseWriter, r *http.Request) {
-	t := time.Now().Format("2006-01-02 15") + ":00"
 	city := mux.Vars(r)["city"]
-	result := OneCitySingleData(t, city)
+	result := OneCityLatestData(city)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
