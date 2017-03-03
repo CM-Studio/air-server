@@ -1,9 +1,9 @@
 package main
 
 type TrendData struct {
-	Ago   string `json:"ago"`
-	Now   string `json:"now"`
-	Trend int    `json:"trend"`
+	Ago   string  `json:"ago"`
+	Now   string  `json:"now"`
+	Trend float64 `json:"trend"`
 }
 
 type CityData struct {

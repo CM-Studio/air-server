@@ -77,7 +77,7 @@ func ReturnDataOfCities(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReturnTrendData(w http.ResponseWriter, r *http.Request) {
-	t := time.Now().Format("2006-01-02 15") + ":00"
+	t := time.Now().Format("2006-01-02")
 	city := mux.Vars(r)["city"]
 
 	result := TrendDataNow(t, city)

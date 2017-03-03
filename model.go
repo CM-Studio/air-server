@@ -48,7 +48,7 @@ var (
 
 func init() {
 	driverName = "mysql"
-	dataSourceName = "root:@tcp(127.0.0.1:3306)/airx?charset=utf8"
+	dataSourceName = "root:123456@tcp(127.0.0.1:3306)/airx?charset=utf8"
 }
 
 func Conn() *sql.DB {
@@ -250,7 +250,7 @@ func TrendDataNow(t string, location string) (datas AQIDatas) {
 	db := Conn()
 	defer db.Close()
 
-	var aqiN, aqiB int
+	var aqiN, aqiB float64
 
 	tnh := time.Now().Hour()
 	tbh := tnh - 1
@@ -258,25 +258,25 @@ func TrendDataNow(t string, location string) (datas AQIDatas) {
 	tn := t + " " + strconv.Itoa(tnh) + ":00"
 	tb := t + " " + strconv.Itoa(tbh) + ":00"
 
-	rowsN, err := db.Query("SELECT avg(AQI) FROM airx.raw where TimePoint='" + tn + "'  and Area='" + location + "';")
+	rowsN, err := db.Query("SELECT avg(AQI) FROM airx.raw where TimePoint=? and Area=?;", tn, location)
 	checkErr(err)
 	defer rowsN.Close()
 
-	var sN sql.NullString
-	err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tn, location).Scan(&sN)
+	// var sN sql.NullString
+	// err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tn, location).Scan(&sN)
 
-	if sN.Valid {
+	if rowsN.Next() {
 		err := rowsN.Scan(&aqiN)
 		checkErr(err)
 
-		rowsB, err := db.Query("SELECT avg(AQI) FROM airx.raw where TimePoint='" + tb + "'  and Area='" + location + "';")
+		rowsB, err := db.Query("SELECT avg(AQI) FROM airx.raw where TimePoint=? and Area=?;", tb, location)
 		checkErr(err)
 		defer rowsB.Close()
 
-		var sB sql.NullString
-		err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tb, location).Scan(&sB)
+		// var sB sql.NullString
+		// err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tb, location).Scan(&sB)
 
-		if sB.Valid {
+		if rowsB.Next() {
 			err := rowsB.Scan(&aqiB)
 			checkErr(err)
 
