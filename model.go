@@ -48,7 +48,7 @@ var (
 
 func init() {
 	driverName = "mysql"
-	dataSourceName = "root:123456@tcp(127.0.0.1:3306)/airx?charset=utf8"
+	dataSourceName = "cmweb:cmweb107@tcp(10.42.0.1:3306)/airx?charset=utf8"
 }
 
 func Conn() *sql.DB {
@@ -70,30 +70,31 @@ func OneCityLatestData(location string) (datas AQIDatas) {
 	db := Conn()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT avg(TimePoint),Area,avg(AQI),avg(O3),avg(CO),avg(SO2),avg(NO2),avg(PM2_5),avg(PM10) FROM airx.raw where TimePoint=(select max(TimePoint) from airx.raw) and Area='" + location + "';")
+	rows, err := db.Query("SELECT TimePoint,City,AQI,Trend,O3,CO,SO2,NO2,PM2_5,PM10 FROM airx.working where TimePoint=(select max(TimePoint) from airx.working) and City='" + location + "';")
 	checkErr(err)
 	defer rows.Close()
 
 	var (
-		time float64
-		area string
-		aqi  float64
-		o3   float64
-		co   float64
-		so2  float64
-		no2  float64
-		pm25 float64
-		pm10 float64
+		time  string
+		city  string
+		aqi   int
+		trend int
+		o3    int
+		co    float64
+		so2   int
+		no2   int
+		pm25  int
+		pm10  int
 	)
 
 	var s sql.NullString
-	err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=(select max(TimePoint) from airx.raw) and Area=? limit 1;", location).Scan(&s)
+	err = db.QueryRow("SELECT City FROM airx.working where TimePoint=(select max(TimePoint) from airx.working) and City=? limit 1;", location).Scan(&s)
 
 	if s.Valid {
 		for rows.Next() {
-			err := rows.Scan(&time, &area, &aqi, &o3, &co, &so2, &no2, &pm25, &pm10)
+			err := rows.Scan(&time, &city, &aqi, &trend, &o3, &co, &so2, &no2, &pm25, &pm10)
 			checkErr(err)
-			data := AQIData{time, area, aqi, o3, co, so2, no2, pm25, pm10}
+			data := AQIData{time, city, aqi, trend, o3, co, so2, no2, pm25, pm10}
 			datas = append(datas, data)
 		}
 	} else {
@@ -109,30 +110,31 @@ func OneCitySingleData(t string, location string) (datas AQIDatas) {
 	db := Conn()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT avg(TimePoint),Area,avg(AQI),avg(O3),avg(CO),avg(SO2),avg(NO2),avg(PM2_5),avg(PM10) FROM airx.raw where TimePoint='" + t + "'  and Area='" + location + "';")
+	rows, err := db.Query("SELECT TimePoint,City,AQI,Trend,O3,CO,SO2,NO2,PM2_5,PM10 FROM airx.working where TimePoint='" + t + "'  and City='" + location + "';")
 	checkErr(err)
 	defer rows.Close()
 
 	var (
-		time float64
-		area string
-		aqi  float64
-		o3   float64
-		co   float64
-		so2  float64
-		no2  float64
-		pm25 float64
-		pm10 float64
+		time  string
+		city  string
+		aqi   int
+		trend int
+		o3    int
+		co    float64
+		so2   int
+		no2   int
+		pm25  int
+		pm10  int
 	)
 
 	var s sql.NullString
-	err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", t, location).Scan(&s)
+	err = db.QueryRow("SELECT City FROM airx.working where TimePoint=? and City=? limit 1;", t, location).Scan(&s)
 
 	if s.Valid {
 		for rows.Next() {
-			err := rows.Scan(&time, &area, &aqi, &o3, &co, &so2, &no2, &pm25, &pm10)
+			err := rows.Scan(&time, &city, &aqi, &trend, &o3, &co, &so2, &no2, &pm25, &pm10)
 			checkErr(err)
-			data := AQIData{time, area, aqi, o3, co, so2, no2, pm25, pm10}
+			data := AQIData{time, city, aqi, trend, o3, co, so2, no2, pm25, pm10}
 			datas = append(datas, data)
 		}
 	} else {
@@ -180,30 +182,31 @@ func OneCityAllDataToday(t string, location string) (datas AQIDatas) {
 			h = t + " " + strconv.Itoa(i) + ":00"
 		}
 
-		rows, err := db.Query("SELECT avg(TimePoint),Area,avg(AQI),avg(O3),avg(CO),avg(SO2),avg(NO2),avg(PM2_5),avg(PM10) FROM airx.raw where TimePoint='" + h + "'  and Area='" + location + "';")
+		rows, err := db.Query("SELECT TimePoint,City,AQI,Trend,O3,CO,SO2,NO2,PM2_5,PM10 FROM airx.working where TimePoint='" + h + "'  and City='" + location + "';")
 		checkErr(err)
 		defer rows.Close()
 
 		var (
-			time float64
-			area string
-			aqi  float64
-			o3   float64
-			co   float64
-			so2  float64
-			no2  float64
-			pm25 float64
-			pm10 float64
+			time  string
+			city  string
+			aqi   int
+			trend int
+			o3    int
+			co    float64
+			so2   int
+			no2   int
+			pm25  int
+			pm10  int
 		)
 
 		var s sql.NullString
-		err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", h, location).Scan(&s)
+		err = db.QueryRow("SELECT City FROM airx.working where TimePoint=? and City=? limit 1;", h, location).Scan(&s)
 
 		if s.Valid {
 			for rows.Next() {
-				err := rows.Scan(&time, &area, &aqi, &o3, &co, &so2, &no2, &pm25, &pm10)
+				err := rows.Scan(&time, &city, &aqi, &trend, &o3, &co, &so2, &no2, &pm25, &pm10)
 				checkErr(err)
-				data := AQIData{time, area, aqi, o3, co, so2, no2, pm25, pm10}
+				data := AQIData{time, city, aqi, trend, o3, co, so2, no2, pm25, pm10}
 				datas = append(datas, data)
 			}
 		} else {
@@ -233,36 +236,37 @@ func OneCityAllDataToday(t string, location string) (datas AQIDatas) {
 
 	没有数据则返回错误信息
 */
-func CompareDataOfCities(t string, locations []string) (datas AQIDatas) {
+func CompareDataOfCities(locations []string) (datas AQIDatas) {
 	db := Conn()
 	defer db.Close()
 
 	for i := 0; i < len(locations); i++ {
 		var (
-			time float64
-			area string
-			aqi  float64
-			o3   float64
-			co   float64
-			so2  float64
-			no2  float64
-			pm25 float64
-			pm10 float64
+			time  string
+			city  string
+			aqi   int
+			trend int
+			o3    int
+			co    float64
+			so2   int
+			no2   int
+			pm25  int
+			pm10  int
 		)
 
-		rows, err := db.Query("SELECT avg(TimePoint),Area,avg(AQI),avg(O3),avg(CO),avg(SO2),avg(NO2),avg(PM2_5),avg(PM10) FROM airx.raw where TimePoint='" + t + "'  and Area='" + locations[i] + "';")
+		rows, err := db.Query("SELECT TimePoint,City,AQI,Trend,O3,CO,SO2,NO2,PM2_5,PM10 FROM airx.working where TimePoint=(select max(TimePoint) from airx.working) and City='" + locations[i] + "';")
 
 		checkErr(err)
 		defer rows.Close()
 
 		var s sql.NullString
-		err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", t, locations[i]).Scan(&s)
+		err = db.QueryRow("SELECT City FROM airx.working where TimePoint=(select max(TimePoint) from airx.working) and City=? limit 1;", locations[i]).Scan(&s)
 
 		if s.Valid {
 			for rows.Next() {
-				err := rows.Scan(&time, &area, &aqi, &o3, &co, &so2, &no2, &pm25, &pm10)
+				err := rows.Scan(&time, &city, &aqi, &trend, &o3, &co, &so2, &no2, &pm25, &pm10)
 				checkErr(err)
-				data := AQIData{time, area, aqi, o3, co, so2, no2, pm25, pm10}
+				data := AQIData{time, city, aqi, trend, o3, co, so2, no2, pm25, pm10}
 				datas = append(datas, data)
 			}
 		} else {
@@ -290,7 +294,7 @@ func TrendDataNow(t string, location string) (datas AQIDatas) {
 	db := Conn()
 	defer db.Close()
 
-	var aqiN, aqiB float64
+	var aqiN, aqiB int
 
 	tnh := time.Now().Hour()
 	tbh := tnh - 1
@@ -298,23 +302,23 @@ func TrendDataNow(t string, location string) (datas AQIDatas) {
 	tn := t + " " + strconv.Itoa(tnh) + ":00"
 	tb := t + " " + strconv.Itoa(tbh) + ":00"
 
-	rowsN, err := db.Query("SELECT avg(AQI) FROM airx.raw where TimePoint=? and Area=?;", tn, location)
+	rowsN, err := db.Query("SELECT AQI FROM airx.working where TimePoint=? and City=?;", tn, location)
 	checkErr(err)
 	defer rowsN.Close()
 
 	var sN sql.NullString
-	err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tn, location).Scan(&sN)
+	err = db.QueryRow("SELECT City FROM airx.working where TimePoint=? and City=? limit 1;", tn, location).Scan(&sN)
 
 	if sN.Valid && rowsN.Next() {
 		err := rowsN.Scan(&aqiN)
 		checkErr(err)
 
-		rowsB, err := db.Query("SELECT avg(AQI) FROM airx.raw where TimePoint=? and Area=?;", tb, location)
+		rowsB, err := db.Query("SELECT AQI FROM airx.working where TimePoint=? and City=?;", tb, location)
 		checkErr(err)
 		defer rowsB.Close()
 
 		var sB sql.NullString
-		err = db.QueryRow("SELECT Area FROM airx.raw where TimePoint=? and Area=? limit 1;", tb, location).Scan(&sB)
+		err = db.QueryRow("SELECT City FROM airx.working where TimePoint=? and City=? limit 1;", tb, location).Scan(&sB)
 
 		if sB.Valid && rowsB.Next() {
 			err := rowsB.Scan(&aqiB)
@@ -350,31 +354,28 @@ func CityTable() (datas AQIDatas) {
 	defer db.Close()
 
 	// 这里可以有个排序，按照城市代码
-	rows, err := db.Query("SELECT distinct CityCode,Area FROM airx.raw;")
+	rows, err := db.Query("SELECT distinct City FROM airx.working;")
 	checkErr(err)
 	defer rows.Close()
 
 	if rows.Next() {
 		// 这里输出第一行数据
-		var (
-			code int
-			city string
-		)
-		err := rows.Scan(&code, &city)
+		var city string
+		err := rows.Scan(&city)
 		checkErr(err)
 
-		data := CityData{code, city}
+		data := CityData{city}
 		datas = append(datas, data)
 
 		for rows.Next() {
-			err := rows.Scan(&code, &city)
+			err := rows.Scan(&city)
 			checkErr(err)
 
-			data := CityData{code, city}
+			data := CityData{city}
 			datas = append(datas, data)
 		}
 	} else {
-		errMsg := jsonErr{Code: 404, Text: "暂时没有此时段的城市表，请稍后重试"}
+		errMsg := jsonErr{Code: 404, Text: "暂时没有城市表，请稍后重试"}
 		datas = append(datas, errMsg)
 	}
 	return

@@ -61,12 +61,11 @@ func ReturnDataOfCities(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
 	var locations []string
-	t := time.Now().Format("2006-01-02 15") + ":00"
 
 	for _, v := range q {
 		locations = append(locations, v[0])
 	}
-	result := CompareDataOfCities(t, locations)
+	result := CompareDataOfCities(locations)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -89,7 +88,6 @@ func ReturnTrendData(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReturnCityTable(w http.ResponseWriter, r *http.Request) {
-	// t := time.Now().Format("2006-01-02 15") + ":00"
 
 	result := CityTable()
 
