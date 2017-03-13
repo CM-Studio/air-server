@@ -205,7 +205,14 @@ func OneCityAllDataToday(t string, location string) (datas AQIDatas) {
 		if s.Valid {
 			for rows.Next() {
 				err := rows.Scan(&time, &city, &aqi, &trend, &o3, &co, &so2, &no2, &pm25, &pm10)
-				checkErr(err)
+				// checkErr(err)
+				if err != nil {
+					// errMsg := jsonErr{Code: 404, Text: "没有" + location + h + "的空气质量数据！"}
+					// datas = append(datas, errMsg)
+					data := AQIData{"", "", 0, 0, 0, 0, 0, 0, 0, 0}
+					datas = append(datas, data)
+					return
+				}
 				data := AQIData{time, city, aqi, trend, o3, co, so2, no2, pm25, pm10}
 				datas = append(datas, data)
 			}

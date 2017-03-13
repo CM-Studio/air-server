@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"sort"
+	"strconv"
 	"time"
 )
 
@@ -61,6 +63,18 @@ func ReturnDataOfCities(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
 	var locations []string
+
+	sorted_keys := make([]int, 0)
+	for k, _ := range q {
+		i, _ := strconv.Atoi(k)
+		sorted_keys = append(sorted_keys, i)
+	}
+
+	// sort 'string' key in increasing order
+	sort.Ints(sorted_keys)
+	for i, j := 0, len(sorted_keys)-1; i < j; i, j = i+1, j-1 {
+		sorted_keys[i], sorted_keys[j] = sorted_keys[j], sorted_keys[i]
+	}
 
 	for _, v := range q {
 		locations = append(locations, v[0])
