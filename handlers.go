@@ -64,20 +64,28 @@ func ReturnDataOfCities(w http.ResponseWriter, r *http.Request) {
 
 	var locations []string
 
+	// 由于遍历 map 时 key 的随机化问题，维护一个有序的 keys 数组保证
+	// 每次的顺序都是固定的
 	sorted_keys := make([]int, 0)
 	for k, _ := range q {
-		i, _ := strconv.Atoi(k)
+		i, err := strconv.Atoi(k)
+		if err != nil {
+			panic(err)
+		}
 		sorted_keys = append(sorted_keys, i)
 	}
 
-	// sort 'string' key in increasing order
+	// sort 'int' key in decreasing order
 	sort.Ints(sorted_keys)
-	for i, j := 0, len(sorted_keys)-1; i < j; i, j = i+1, j-1 {
-		sorted_keys[i], sorted_keys[j] = sorted_keys[j], sorted_keys[i]
-	}
 
-	for _, v := range q {
-		locations = append(locations, v[0])
+	// if you want key in increasing order
+	// for i, j := 0, len(sorted_keys)-1; i < j; i, j = i+1, j-1 {
+	// 	sorted_keys[i], sorted_keys[j] = sorted_keys[j], sorted_keys[i]
+	// }
+
+	for _, v := range sorted_keys {
+		k := strconv.Itoa(v)
+		locations = append(locations, q[k][0])
 	}
 	result := CompareDataOfCities(locations)
 
